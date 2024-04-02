@@ -2,18 +2,46 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 function SignUP() {
   const {
     register,
     handleSubmit,
-    watch,
-   
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
 
-  console.log(watch("example"));
+  const onSubmit = async (data) => {
+    try {
+      const userInfo = {
+        Name: data.Name,
+        Email: data.Email,
+        Password: data.Password,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/user/signup",
+        userInfo
+      );
+
+      // Check if the response contains data and show success message
+      if (response.data) {
+        console.log(response.data);
+        toast.success("Registered Successfully");
+        window.location.href = "/";
+
+        // Store the user data in localStorage
+        localStorage.setItem("Users", JSON.stringify(response.data.user));
+      }
+    } catch (error) {
+      // Log the error and show an error message
+      console.error("Error:", error);
+      toast.error("Error: " + error.response.data.message);
+    }
+  };
+
+  
 
   return (
     <>
@@ -34,11 +62,9 @@ function SignUP() {
                 type="text"
                 name="username"
                 id="username"
-                
-                
                 placeholder="Enter Name"
                 className="w-full px-4 py-3 rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 focus:dark:border-violet-600"
-                {...register("name", {
+                {...register("Name", {
                   required: true,
                   pattern: {
                     value: /^[A-Za-z]+$/i,
@@ -46,9 +72,9 @@ function SignUP() {
                   },
                 })}
               />
-              {errors.name && (
+              {errors.Name && (
                 <span className="mt-2 flex text-red-500">
-                  {errors.name.message || "This field is required."}
+                  {errors.Name.message || "This field is required."}
                 </span>
               )}
             </div>
@@ -57,14 +83,14 @@ function SignUP() {
                 Email address
               </label>
               <input
-                type="text"
+                type="Email"
                 name="Email"
                 id="Email"
                 placeholder="Enter Email"
                 className="w-full px-4 py-3 rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 focus:dark:border-violet-600"
-                {...register("email", { required: true })}
+                {...register("Email", { required: true })}
               />
-              {errors.email && (
+              {errors.Email && (
                 <span className="mt-2 flex text-red-500">
                   This field is required.
                 </span>
@@ -80,7 +106,7 @@ function SignUP() {
                 id="password"
                 placeholder="Password"
                 className="w-full px-4 py-3 rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 focus:dark:border-violet-600"
-                {...register("password", {
+                {...register("Password", {
                   required: "This field is required.",
                   minLength: {
                     value: 8,
@@ -88,34 +114,9 @@ function SignUP() {
                   },
                 })}
               />
-              {errors.password && (
+              {errors.Password && (
                 <span className="mt-2 flex text-red-500">
-                  {errors.password.message || "This field is required."}
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-1 text-sm">
-              <label htmlFor="password" className="block dark:text-gray-600">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Re-type Password"
-                className="w-full px-4 py-3 rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 focus:dark:border-violet-600"
-                {...register("retype", {
-                  required: "This field is required.",
-                  minLength: {
-                    value: 8,
-                    message: "Password should contain at least 8 characters.",
-                  },
-                })}
-              />
-              {errors.retype && (
-                <span className="mt-2 flex text-red-500">
-                  {errors.retype.message || "This field is required."}
+                  {errors.Password.message || "This field is required."}
                 </span>
               )}
             </div>

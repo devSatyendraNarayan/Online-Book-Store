@@ -1,9 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import LoginModal from "./LoginModal";
-
+import Logoutbtn from "./Logoutbtn";
+import { useAuth } from "../context/AuthProvider";
 
 function Navbar() {
+  const {authUser, setAuthUser} = useAuth();
+
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
@@ -54,10 +57,11 @@ function Navbar() {
   return (
     <>
       <div
-        className={`max-w-screen-2xl container mx-auto md:px-20 px-4 dark:bg-gray-100 dark:text-gray-800 fixed top-0 left-0 right-0 z-50 ${sticky
+        className={`max-w-screen-2xl container mx-auto md:px-20 px-4 dark:bg-gray-100 dark:text-gray-800 fixed top-0 left-0 right-0 z-50 ${
+          sticky
             ? "sticky-navbar shadow-md bg-base-300 duration-300 transition-all ease-in-out"
             : ""
-          }`}
+        }`}
       >
         <div className="navbar dark:bg-gray-100 dark:text-gray-800">
           <div className="navbar-start">
@@ -84,7 +88,7 @@ function Navbar() {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-md rounded-box w-52"
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-md rounded-box w-52 bg-gray-900"
               >
                 {navItem}
               </ul>
@@ -145,9 +149,17 @@ function Navbar() {
                 </svg>
               </label>
             </div>
-            <div onClick={() => document.getElementById("my_modal_3").showModal()}>
-            <LoginModal/>
-            </div>
+            {authUser ? (
+              <Logoutbtn />
+            ) : (
+              <div
+                onClick={() =>
+                  document.getElementById("my_modal_3").showModal()
+                }
+              >
+                <LoginModal />
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -3,18 +3,52 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form"
-
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 function LoginModal() {
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-      } = useForm()
-      const onSubmit = (data) => console.log(data)
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
 
-      console.log(watch("example"))
+  const onSubmit = async (data) => {
+    try {
+      const userInfo = {
+        Email: data.Email,
+        Password: data.Password,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/user/login",
+        userInfo
+      );
+
+      // Check if the response contains data and show success message
+      if (response.data) {
+        console.log(response.data);
+        // Store the user data in localStorage
+        localStorage.setItem("Users", JSON.stringify(response.data.user));
+
+        toast.success("Logged in Successfully");
+        document.getElementById("my_modal_3").close();
+        setTimeout(() => {
+          window.location.reload();
+         
+
+          
+        }, 2000);
+      }
+    } catch (error) {
+      // Log the error and show an error message
+      toast.error("Error: " + error.response.data.message);
+      setTimeout(() => {}, 3000);
+    }
+  };
+
+  console.log(watch("example"));
   return (
     <>
       <div>
@@ -31,7 +65,11 @@ function LoginModal() {
         id="my_modal_3"
         className="modal-box  max-w-md dark:bg-gray-50 dark:text-gray-800"
       >
-        <form method="dialog" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          method="dialog"
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
             ✕
           </button>
@@ -47,9 +85,13 @@ function LoginModal() {
                 id="email"
                 placeholder="Email"
                 className="w-full px-4 py-3 rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 focus:dark:border-violet-600"
-                {...register("email", { required: true })}
+                {...register("Email", { required: true })}
               />
-               {errors.email && <span className="mt-2 flex text-red-500">Enter your username.</span>}
+              {errors.Email && (
+                <span className="mt-2 flex text-red-500">
+                  Enter your username.
+                </span>
+              )}
             </div>
             <div className="space-y-1 text-sm">
               <label htmlFor="password" className="block dark:text-gray-600">
@@ -61,9 +103,13 @@ function LoginModal() {
                 id="password"
                 placeholder="Password"
                 className="w-full px-4 py-3 rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 focus:dark:border-violet-600"
-                {...register("password", { required: true })}
+                {...register("Password", { required: true })}
               />
-               {errors.password && <span className="mt-2 flex text-red-500">Enter your password.</span>}
+              {errors.Password && (
+                <span className="mt-2 flex text-red-500">
+                  Enter your password.
+                </span>
+              )}
               <div className="flex justify-end text-xs dark:text-gray-600 pt-1">
                 <a rel="noopener noreferrer" href="#">
                   Forgot Password?
@@ -76,9 +122,7 @@ function LoginModal() {
           </div>
           <div className="flex items-center pt-4 space-x-1">
             <div className="flex-1 h-px sm:w-16 dark:bg-gray-300"></div>
-            <p className="px-3 text-sm dark:text-gray-600">
-              Or Sign in with
-            </p>
+            <p className="px-3 text-sm dark:text-gray-600">Or Sign in with</p>
             <div className="flex-1 h-px sm:w-16 dark:bg-gray-300"></div>
           </div>
 
@@ -113,13 +157,14 @@ function LoginModal() {
           </div>
 
           <p className="text-xs text-center sm:px-6 dark:text-gray-600">
-            Don't have an account? 
-            <Link to="/SignUp"
+            Don't have an account?
+            <Link
+              to="/SignUp"
               rel="noopener noreferrer"
               href="#"
               className="underline dark:text-violet-600 font-semibold"
             >
-               <span> Register</span>
+              <span> Register</span>
             </Link>
           </p>
         </form>
